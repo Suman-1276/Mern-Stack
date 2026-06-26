@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon Lite</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    padding:20px;
+    background:#f5f5f5;
+}
+
+h1{
+    text-align:center;
+    color:#232f3e;
+}
+
+.top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:20px 0;
+    gap:10px;
+}
+
+.search-box{
+    flex:1;
+}
+
+.search-box input{
+    width:100%;
+    padding:10px;
+    font-size:16px;
+}
+
+.filters{
+    display:flex;
+    gap:10px;
+}
+
+select{
+    padding:10px;
+}
+
+#productContainer{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    gap:20px;
+}
+
+.product{
+    background:white;
+    border-radius:10px;
+    padding:15px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.product img{
+    width:100%;
+    height:200px;
+    object-fit:contain;
+}
+
+button{
+    background:#ff9900;
+    border:none;
+    padding:10px 15px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#e68a00;
+}
+</style>
+</head>
+<body>
+
+<h1>Amazon Store</h1>
+
+<div class="top-bar">
+
+    <div class="search-box">
+        <input type="text" id="searchBar" placeholder="Search products...">
+    </div>
+
+    <div class="filters">
+
+        <select id="sort">
+            <option value="">Sort By</option>
+            <option value="low">Price: Low to High</option>
+            <option value="high">Price: High to Low</option>
+        </select>
+
+        <select id="priceFilter">
+            <option value="all">All Prices</option>
+            <option value="5000">Below ₹5000</option>
+            <option value="15000">₹5000 - ₹15000</option>
+            <option value="50000">Above ₹15000</option>
+        </select>
+
+    </div>
+
+</div>
+
+<div id="productContainer"></div>
+
+<script>
+
+let container = document.getElementById("productContainer");
+let searchBar = document.getElementById("searchBar");
+let sort = document.getElementById("sort");
+let priceFilter = document.getElementById("priceFilter");
+
+let products = [
+{
+    pname:"Watch",
+    cname:"Titan",
+    price:4000,
+    img:"https://thewatchshop.in/cdn/shop/files/9947-Blk-A.jpg?v=1738318661"
+},
+{
+    pname:"Mobile",
+    cname:"Samsung",
+    price:15000,
+    img:"https://quickmobile-testing.s3.ap-south-1.amazonaws.com/categoryImage/1770745495082-phone%20%281%29.png"
+},
+{
+    pname:"Laptop",
+    cname:"Dell",
+    price:50000,
+    img:"https://cdn-dynmedia-1.microsoft.com/is/image/microsoftcorp/13-laptop-platinum-right-render-fy25:VP4-1260x795?fmt=png-alpha"
+},
+{
+    pname:"Headphone",
+    cname:"Noise",
+    price:2000,
+    img:"https://www.boat-lifestyle.com/cdn/shop/files/Artboard2_52206726-98d5-45a4-b521-f034ec83e7b6.png"
+},
+{
+    pname:"TV",
+    cname:"Vise",
+    price:13500,
+    img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiOPMiTCuRF7sumM0kuyan2-Xh0Jr1AUYfng&s"
+},
+{
+    pname:"Oven",
+    cname:"Borosil",
+    price:13500,
+    img:"https://www.foodandwine.com/thmb/QGfy8Mosc8NTBph1zXKZDv-rVak=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/our-place-large-wonder-oven-tout-1efc844998b549cbb562c8461bc7aab1.jpg"
+}
+];
+
+function display(list){
+
+    container.innerHTML = "";
+
+    list.forEach(product=>{
+
+        let div = document.createElement("div");
+        div.classList.add("product");
+
+        div.innerHTML = `
+            <img src="${product.img}" alt="${product.pname}">
+            <h3>${product.pname}</h3>
+            <p>${product.cname}</p>
+            <p><strong>₹${product.price}</strong></p>
+            <button>Buy Now</button>
+        `;
+
+        container.appendChild(div);
+    });
+}
+
+function filterProducts(){
+
+    let filtered = [...products];
+
+    
+    let keyword = searchBar.value.toLowerCase();
+
+    filtered = filtered.filter(product =>
+        product.pname.toLowerCase().includes(keyword) ||
+        product.cname.toLowerCase().includes(keyword)
+    );
+
+    // Price Filter
+    let priceValue = priceFilter.value;
+
+    if(priceValue === "5000"){
+        filtered = filtered.filter(p => p.price < 5000);
+    }
+    else if(priceValue === "15000"){
+        filtered = filtered.filter(
+            p => p.price >= 5000 && p.price <= 15000
+        );
+    }
+    else if(priceValue === "50000"){
+        filtered = filtered.filter(p => p.price > 15000);
+    }
+
+    
+    if(sort.value === "low"){
+        filtered.sort((a,b)=>a.price-b.price);
+    }
+    else if(sort.value === "high"){
+        filtered.sort((a,b)=>b.price-a.price);
+    }
+
+    display(filtered);
+}
+
+searchBar.addEventListener("input", filterProducts);
+sort.addEventListener("change", filterProducts);
+priceFilter.addEventListener("change", filterProducts);
+
+display(products);
+
+</script>
+
+</body>
+</html>
